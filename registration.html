@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>VELZ Registration</title>
+		<link rel="stylesheet" href="css/reg_page.css">
+		<link href="https://fonts.googleapis.com/css?family=Bitter" rel="stylesheet">
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+	</head>
+	<script>
+		function check_unique()//check the phone and email is unique or not
+		{
+			let phone=document.getElementById("reg_phone").value;
+			let email=document.getElementById("reg_email").value;
+			//$sql = mysql("SELECT Password FROM User WHERE PhoneNumber =" + phone );
+			//if(sql!=0)
+			//{
+			//	document.getElementById("phone-error").removeAttribute("style");
+			//  return false;
+			//}
+			//$sql = mysql ("SELECT Password FROM User WHERE Email =" + email);
+			//if(sql!=0)
+			//{
+			//	document.getElementById("email-error").removeAttribute("style");
+			//  return false;
+			//}
+			return true;
+		}
+		
+		function check_reg()//check whether the registration info is valid
+		{
+			document.getElementById("phone-error").setAttribute("style","display: none;");
+			document.getElementById("email-error").setAttribute("style","display: none;");
+			document.getElementById("pass-error").removeAttribute("style");
+			document.getElementById("reenter-error").setAttribute("style","display: none;");
+			let email=document.getElementById("reg_email").value;
+			let pass=document.getElementById("reg_password").value;
+			let checkpass=document.getElementById("check_password").value;
+			let phone=document.getElementById("reg_phone").value;
+			if(email==""||email.indexOf("@")==-1)
+			{
+				document.getElementById("email-error").removeAttribute("style");
+			}
+			else if(phone.length!=10)
+			{
+				document.getElementById("phone-error").removeAttribute("style");
+			}
+			else if(pass.length<6)
+			{
+				document.getElementById("pass-error").setAttribute("style","color:red;");
+			}
+			else if(pass!=checkpass)
+			{
+				document.getElementById("reenter-error").removeAttribute("style");
+			}
+			else
+			{
+				if(check_unique()==true)
+				{
+					setTimeout(function(){document.getElementsByClassName("reg_button")[0].setAttribute("value","Loading ...");},700);
+					setTimeout(function(){document.getElementsByClassName("reg_button")[0].setAttribute("value","Loading ......");},1400);
+					setTimeout(function(){document.getElementsByClassName("reg_button")[0].setAttribute("value","Loading .........");},2100);
+				    setTimeout(function(){
+					    document.getElementsByClassName("reg_content")[0].setAttribute("style","display: none;");
+					    document.getElementById("reg_success").removeAttribute("style");
+				    },2500);
+				}
+			}
+		}
+	</script>
+	<body>
+		<div class="web_title"><img src="img/web_name.png" /></div>
+		<div class="reg_content">
+			<div id="reg_title">Create account</div>
+			<div class="no_input">Your name</div>
+			<div><input type="text" id="reg_name"></div>
+			<div class="no_input">Email</div>
+			<div><input type="text" id="reg_email"></div>
+			<div class="error" id="email-error" style="display: none;">*Your e-mail address is not valid.</div>
+			<div class="no_input">Phone Number</div>
+			<div><input type="text" id="reg_phone"></div>
+			<div class="error" id="phone-error" style="display: none;">*Your phone number is not valid.</div>
+			<div class="no_input">Password</div>
+			<div><input type="password" id="reg_password"></div>
+			<div class="password_hint" id="pass-error">*Password must be at least 6 characters.</div>
+			<div class="error" id="reenter-error" style="display: none;">*Your password does not match.</div>
+			<div class="no_input">Re-enter password</div>
+			<div><input type="password" id="check_password"></div>
+			<div><input type="button" class="reg_button" value="Create your VELZ's account" onclick="check_reg()"></div>
+			<div class="break_line"></div>
+			<div class="policy">
+				<p>By creating an account, you agree to VELZ's <a href="">Conditions of Use</a> and <a href="">Privacy Notice</a>.</p>
+			</div>
+		</div>
+		<div id="reg_success" style="display: none;">
+			<div>Congratulations !</div>
+			<div>Your Registration is success.</div>
+			<div id="back_home" onclick="window.close()">go back to sign in</div>
+		</div>
+	</body>
+
+</html>

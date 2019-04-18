@@ -1,0 +1,443 @@
+<!doctype html>
+<html lang="en-US">
+
+	<head>
+		<meta http-equiv="Content-Type" content="text/html">
+		<title>VELZ's Market</title>
+		<link rel="stylesheet" href="css/style.css">
+		<link rel="stylesheet" href="css/main_page.css">
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script type="text/javascript" src="js/menu.js"></script>
+		<script type="text/javascript" src="js/mainpage.js"></script>
+		<link href="https://fonts.googleapis.com/css?family=Bitter" rel="stylesheet">
+	</head>
+
+	<body>
+		<div id="pgcontainer">
+			<header>
+				<div class="big-title">
+					<a href=""><b>SEE SOMETHING NEW,</b> EVERY DAY.</a>
+				</div>
+				<div id="navbar">
+					<!-- use captain icon for toggle menu -->
+					<table class="main-nav-up">
+						<tr>
+							<td>
+								<a href="#" class="menubtn">menu</a>
+							</td>
+							<td>
+								<a href="" class="website_name">
+									<img src="img/web_name.png" />
+								</a>
+							</td>
+							<td>
+								<select class="nav_select">
+									<option class="nav_select_option" selected="true">All</option>
+								</select>
+							</td>
+							<td>
+								<input type="text" class="nav_search_input" />
+							</td>
+							<td>
+								<a href="#" class="nav_search_pic"><img src="img/search_icon.png" onclick="open_search()"></a>
+							</td>
+						</tr>
+					</table>
+					<div id="hamburgermenu">
+						<ul>
+							<li>
+								<a href="#" class="left_bar" onclick="show_home()">Home</a>
+							</li>
+							<li>
+								<a href="#" class="left_bar">Shopping Cart</a>
+							</li>
+							<li>
+								<a href="#" class="left_bar" onclick="show_account()">Account</a>
+							</li>
+							<li>
+								<a href="#" class="left_bar" onclick="show_order()">Orders</a>
+							</li>
+							<li>
+								<a href="#" class="left_bar">Promotions</a>
+							</li>
+							<li>
+								<a href="#" class="left_bar">News</a>
+							</li>
+							<li>
+								<a href="#" class="left_bar">Contact</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<div class="overlay"></div>
+				<div class="nav_left">
+					<div class="nav_deliver_pic"><img class="nav_deliver_pic" src="img/position.png"></div>
+					<div class="nav_deliver">
+						<span class="nav_deliver_line1">Deliver To</span>
+						<span class="nav_deliver_line2">La crosse 54601</span>
+					</div>
+				</div>
+				<table class="nav_subtitles">
+					<tr>
+						<td>
+							<a id="nav-your-velz">Your VELZ.com</a>
+						</td>
+					</tr>
+				</table>
+				<div class="nav_right">
+					<a href="#">
+						<div id="sign_out" style="visibility: hidden;" onclick="sign_out()">Sign Out</div>
+					</a>
+					<ul>
+						<li>
+							<div class="nav_signin" onclick="open_sign()">
+								<span class="nav_signin_line1">Hello, Sign in</span>
+								<span class="nav_signin_line2">Account & lists</span>
+							</div>
+						</li>
+						<li class="nav_orders">
+							<div class="nav_orders" onclick="show_order()">
+								Orders
+							</div>
+						</li>
+						<li>
+							<div class="nav_vip">
+								Try VIP
+							</div>
+						</li>
+						<li>
+							<div class="nav_cart">
+								Cart <span id="cart_num">0</span>
+							</div>
+						</li>
+					</ul>
+					<div id="sign_page" class="display_off" style="display: none;">
+						<div id="delete_div" onclick="close_sign()"><img src="img/delete_button.png" /></div>
+						<div id="sign_title">Sign In</div>
+						<div class="sign_content">
+							<div class="no-input">Email or Phone Number</div>
+							<div><input type="text" id="sign_account"></div>
+							<span id="wrong_pass" style="display: none;">*Wrong password or account name!</span>
+							<div class="no-input">Password
+								<a href="">Forgot your password?</a>
+							</div>
+							<div><input type="password" id="sign_password"></div>
+							<div><input type="button" class="signIn_button" value="Sign In" onclick="check_signIn()"></div>
+							<div class="break_line"></div>
+							<div class="new_velz">
+								<h5>New to VELZ?</h5></div>
+							<div class="sign_create"><input type="button" style="cursor:pointer;" value="Create your VELZ account" onclick="create_user()"></div>
+						</div>
+					</div>
+				</div>
+				<div id="cart_div">
+					<h1>Your List</h1>
+					<table id="cart_table"></table>
+					<div><input type="button" id="clear_cart" value="Clear All" onclick="clear_cart();"><div>Total Price(no tax): $<span id="cart_total_price">0</span></div></div>
+					<input type="button" class="goldern_button" value="Check Out" id="cart_check" onclick="cartCkeck()"/>
+				</div>
+			</header>
+			<div id="content" class="big_page">
+				<img class="scroll_botton" id="scroll_right" src="img/right_arrow.png" onclick="sc_right()">
+				<img class="scroll_botton" id="scroll_left" src="img/left_arrow.png" onclick="sc_left()">
+				<div id="screen_div">
+					<div id="scroll_div">
+						<a href="#" onclick="open_item(document.getElementsByClassName('scroll_pic')[0])"><img class="scroll_pic" src="test_item/71.jpg" alt="0"></a>
+						<a href="#" onclick="open_item(document.getElementsByClassName('scroll_pic')[1])"><img class="scroll_pic" src="test_item/hgce-freedom-gundam-revive-1-768x484.jpg" alt="1"></a>
+						<a href="#" onclick="open_item(document.getElementsByClassName('scroll_pic')[2])"><img class="scroll_pic" src="test_item/newborn-revive-guncannon-box-art-2.jpg" alt="2"></a>
+						<a href="#" onclick="open_item(document.getElementsByClassName('scroll_pic')[3])"><img class="scroll_pic" src="test_item/201511021821571f8-768x486.jpg" alt="3"></a>
+						<a href="#" onclick="open_item(document.getElementsByClassName('scroll_pic')[4])"><img class="scroll_pic" src="test_item/20110831001953816.jpg" alt="4"></a>
+						<a href="#" onclick="open_item(document.getElementsByClassName('scroll_pic')[5])"><img class="scroll_pic" src="test_item/TB1vP0sHFXXXXbkaXXXXXXXXXXX_!!0-item_pic.jpg" alt="5"></a>
+						<a href="#" onclick="open_item(document.getElementsByClassName('scroll_pic')[6])"><img class="scroll_pic" src="test_item/TB2v48udXXXXXamXXXXXXXXXXXX_!!2340787172.jpg" alt="6"></a>
+					</div>
+				</div>
+				<div style="float: left; padding: 100px;"></div>
+			</div>
+			<div id="account" style="display: none;" class="big_page">
+				<h1 style="text-align: left;margin-left: 30px;">Your Account</h1>
+				<div class="account_content">
+					<table>
+						<tr>
+							<td>
+								<div id="your_orders" class="account_div">
+									<img alt="Your Orders" src="img/order.png">
+									<div>Your Orders</div>
+									<span>Track, return, or buy things again</span>
+								</div>
+							</td>
+							<td>
+								<div id="Login_security" class="account_div">
+									<img alt="Login &amp; security" src="img/lock.png">
+									<div>Login & Security</div>
+									<span>Edit login, name, and phone</span>
+								</div>
+							</td>
+							<td>
+								<div id="VELZ's_VIP" class="account_div">
+									<img alt="Prime" src="img/vip.png">
+									<div>VELZ's VIP</div>
+									<span>View benefit and payment settings</span>
+								</div>
+							</td>
+						</tr>
+						<td>
+							<div id="Your_address" class="account_div">
+								<img style="margin-top: 8px;margin-right:4.5px; margin-left: -1px; width: 70px;" alt="Your Addresses" src="img/address.png">
+								<div>Your Addresses</div>
+								<span>Edit addresses for order and gifts</span>
+							</div>
+						</td>
+						<td>
+							<div id="payment_options" class="account_div">
+								<img style="margin-top: 8px;margin-right:4.5px; margin-left: -1px; width: 70px;" alt="Payment options" src="img/payment.png">
+								<div>Payment Options</div>
+								<span>Edit or add payment methods</span>
+							</div>
+						</td>
+						<td>
+							<div id="Promo_Codes" class="account_div">
+								<img alt="Promo Code" src="img/promo.png" />
+								<div>Promo Codes</div>
+								<span>View your promotion codes</span>
+							</div>
+						</td>
+					</table>
+				</div>
+			</div>
+			<div id="search" class="big_page" style="display: none;">
+				<div id="search_result_info"></div>
+				<div id="search_option_left">
+
+				</div>
+				<div id="search_items">
+
+				</div>
+			</div>
+			<div id="edit_promo" class="big_page" style="display: none;">
+				<h1 style="text-align: left;">Edit Promo Codes</h1>
+				<div class="edit_promo_content">
+					<div class="form_container" id="promo_search_form">
+						<form>
+							<div class="form-group">
+								<label for="search_promo_Field">Search Item</label>
+								<input class="promo_form_input" placeholder="search" type="text" id="search_promo_Field" />
+							</div>
+							<input style="padding-top: 0px;" class="promo_form_input" type="button" value="&darr;" id="search_promo_Button" onclick="searchPromo()" />
+						</form>
+					</div>
+					<div class="form_container" id="promo_add_form">
+						<form>
+							<div class="form-group">
+								<label for="promo_name_Field">Item Name:</label>
+								<select style="max-width: 400px;min-width: 200px;" class="promo_form_input" id="promo_name_Field"></select>
+							</div>
+							<div class="form-group">
+								<label for="promo_rate_field">Rate(%):</label>
+								<input class="promo_form_input" type="number" min="1" max="100" value="20" id="promo_rate_field">
+							</div>
+							<div class="form-group">
+								<label for="dueField">Start Date:</label>
+								<input class="promo_form_input" type="date" id="startField" />
+							</div>
+							<div class="form-group">
+								<label for="dueField">Due Date:</label>
+								<input class="promo_form_input" type="date" id="dueField" />
+							</div>
+							<input class="promo_form_input" type="button" value="+" id="add_promo_Button" onclick="addNewPromo()" />
+						</form>
+					</div>
+					<table id="promo_table">
+						<thead>
+							<th style="width: 602px;padding-left: 8px;">Item Name</th>
+							<th style="width: 99px;">Rate(%)</th>
+							<th style="width: 235px;">Start Date</th>
+							<th style="width: 235px;">Due Date</th>
+							<th style="width: 165px;">Discount Price</th>
+						</thead>
+						<tbody class="promo_tbody"></tbody>
+					</table>
+				</div>
+			</div>
+			<div id="item_page" class="big_page" style="display: none;">
+				<div class="back_result"><span onclick="back_result()">&lt Back to results</span></div>
+				<div id="item_content">
+					<div id="item_img"></div>
+					<div id="item_option">
+						<div id="item_option_up"></div>
+						<div id="item_option_down">
+							<table id="price_table">
+								<tr>
+									<td>List Price:</td>
+									<td id="list_price"></td>
+								</tr>
+								<tr>
+									<td>Price for VELZ's VIP:</td>
+									<td id="VIP_price"></td>
+								</tr>
+								<tr>
+									<td>You can save:</td>
+									<td id="save_price"></td>
+								</tr>
+								<tr>
+									<td style="font-size: 0.8em;">Promotions:</td>
+									<td>
+										<div id="get_promtion" onclick="get_promocode(event)">get the promotion code</div>
+									</td>
+								</tr>
+							</table>
+							<table id="buy_option_table">
+								<tr>
+									<td>Color type</td>
+									<td id="color_type"></td>
+								</tr>
+								<tr>
+									<td>Size</td>
+									<td id="item_size"></td>
+								</tr>
+								<tr>
+									<td>Quantity</td>
+									<td id="buy_quantity">
+										<input type="button" value="-" onclick="change_val(document.getElementById('buy_num_entered'),-1)" />
+										<input id="buy_num_entered" type="number" min="1" value="1" />
+										<input type="button" value="+" onclick="change_val(document.getElementById('buy_num_entered'),1)" />
+										<p>(<span></span> In Stock)</p>
+									</td>
+								</tr>
+							</table>
+						</div>
+						<ul id="add_or_buy">
+							<li onclick="addcart()"><img src="img/cart.png"> Add to Cart</li>
+							<li onclick="buynow()">Buy Now</li>
+						</ul>
+					</div>
+				</div>
+				<div id="item_details">
+
+				</div>
+			</div>
+			<div id="checkout_page" class="big_page" style="display: none;">
+				<h1 style="text-align: left;margin-bottom: 0px;">Check Out</h1>
+				<div id="checkout_address" style="display: inline-block;position: relative;top: -100px;">
+					<div id="checkaddr_title">Please check your shipping address.</div>
+					<table id="checkaddr_table">
+						<tr>
+							<td><label for="checkaddr_name">Full Name: </label></td>
+							<td><input class="promo_form_input" type="text" id="checkaddr_name" /></td>
+						</tr>
+						<tr>
+							<td><label for="checkaddr_addr1">Address Line 1: </label></td>
+							<td><input class="promo_form_input" type="text" id="checkaddr_addr1" /></td>
+						</tr>
+						<tr>
+							<td><label for="checkaddr_addr2">Address Line 2: </label></td>
+							<td><input class="promo_form_input" type="text" id="checkaddr_addr2" /></td>
+						</tr>
+						<tr>
+							<td><label for="checkaddr_city">City: </label></td>
+							<td><input class="promo_form_input" type="text" id="checkaddr_city" /></td>
+						</tr>
+						<tr>
+							<td><label for="checkaddr_state">State/Province/Region: </label></td>
+							<td><input class="promo_form_input" type="text" id="checkaddr_state" /></td>
+						</tr>
+						<tr>
+							<td><label for="checkaddr_zip">ZIP: </label></td>
+							<td><input class="promo_form_input" type="text" id="checkaddr_zip" /></td>
+						</tr>
+						<tr>
+							<td><label for="checkaddr_country">Country/Region: </label></td>
+							<td><input class="promo_form_input" type="text" id="checkaddr_country" /></td>
+						</tr>
+						<tr>
+							<td><label for="checkaddr_phone">Phone number: </label></td>
+							<td><input class="promo_form_input" type="text" id="checkaddr_phone" /></td>
+						</tr>
+					</table>
+				</div>
+				<div id="checkout_content" style="display: inline-block;width: 900px;">
+					<div id="checkitem_title">Shipping Item List</div>
+					<table id="checkitem_table">
+						<thead>
+							<th style="width: 500px;color: #484848;">Item Name</th>
+							<th style="width: 100px;color: #484848;">Quantity</th>
+							<th style="width: 200px;color: #484848;">Use Promotions</th>
+							<th style="width: 100px;color: #484848;">Price</th>
+						</thead>
+						<tbody></tbody>
+					</table>
+					<div id="total_count">
+					    <div>Total Price: <div>$</div><div class="finalprice">0</div></div>
+					    <div id="tax_div" title="5" style="font-size: 15px;margin-right: 12px;">Tax: <div>$</div><div class="finalprice">0</div></div>
+					    <div>Total Price+Tax: <div>$</div><div class="finalprice">0</div></div>
+					    <input class="goldern_button" style="background: #DCDCDC;color: #555555;" type="button" value="Cancel" onclick="show_home()">
+					    <input class="goldern_button" id="pay_button" type="button" value="Go to Pay" onclick="update_pay_div()">
+					</div>
+					<div id="checkout_payment" style="display: none;">
+						<h1>Select a payment method</h1>
+						<div>
+							<table id="payment_table">
+								<thead>
+									<th style="width: 400px;">Your credit and debit cards</th>
+									<th>Name on card</th>
+									<th>Expires date</th>
+								</thead>
+								<tbody></tbody>
+							</table>
+						</div>
+						<div>
+							<div>Add new Credit or Debit Cards</div>
+							<div>VELZ accepts all major credit and debit cards:</div>
+							<div>
+								<div id="Card_field">
+									<div>
+										<label for="check_card_name">Name on card</label>
+										<input style="width: 150px;" id="check_card_name" type="text" maxlength="20" class="promo_form_input">
+									</div>
+									<div>
+										<label for="check_card_num">Card number</label>
+										<input style="width: 190px;" id="check_card_num" type="text" maxlength="20" class="promo_form_input">
+									</div>
+									<div>
+										<label for="check_card_num">Card Type</label>
+										<select class="promo_form_input" id="check_card_type">
+											<option>Visa</option>
+											<option>Debit</option>
+										</select>
+									</div>
+									<div>
+										<label>Expiration date</label>
+										<select class="promo_form_input" id="card_month"></select>
+										<select style="margin-left: -5px;" id="card_year" class="promo_form_input"></select>
+									</div>
+									<div>
+										<input id="addcard_button" type="button" value="Add your card" onclick="addcard(event)">
+									</div>
+								</div>
+							</div>
+						</div>
+						<input class="goldern_button" style="background: #DCDCDC;color: #555555;margin-left: 550px;" type="button" value="Back" onclick="PayDiv_toggle()">
+					    <input class="goldern_button" type="button" value="Pay Order" onclick="go_pay()">
+					    <span style="display: none;">You must choose one payment option</span>
+					</div>
+					</div>
+				</div>
+				<div id="order_page" class="big_page" style="display: none;">
+					<h1 style="text-align: left;margin-bottom: 0px;">Your Orders</h1>
+					<table id="order_table">
+						<thead>
+							<th style="width: 514px;">Item Name</th>
+							<th >Quantity</th>
+							<th >Use Promotions</th>
+							<th >Price</th>
+							<th >Order Date</th>
+							<th >Order Status</th>
+							<th></th>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</body>
+
+</html>
