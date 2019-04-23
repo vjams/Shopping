@@ -1,3 +1,4 @@
+
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 
 SET time_zone = "+08:00";
@@ -24,7 +25,11 @@ CREATE TABLE `Register_User` (
 
   `password` bigint(10) DEFAULT NULL,
 
-  `Shipping_Address` varchar(100) DEFAULT NULL
+  `Shipping_Address` varchar(100) DEFAULT NULL,
+  
+  'email' varchar(20) NOT NULL,
+  
+  'phoneNumber' bigint(12) DEFUALT NULL
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
 
