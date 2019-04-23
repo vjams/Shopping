@@ -9,6 +9,9 @@ CREATE DATABASE ShoppingCart;
 USE ShoppingCart;
 
 
+SET FOREIGN_KEY_CHECKS=0
+
+
 CREATE TABLE `Register_User` (
 
   `ExistedUser_ID` int(2) NOT NULL,
@@ -17,11 +20,11 @@ CREATE TABLE `Register_User` (
 
   `FirstName` varchar(11) DEFAULT NULL,
 
-  `Existed_UserName` varchar(11) DEFAULT NULL,
+  `Existed_UserName` varchar(50) DEFAULT NULL,
 
   `password` bigint(10) DEFAULT NULL,
 
-  `Shipping_Address` varchar(9) DEFAULT NULL
+  `Shipping_Address` varchar(100) DEFAULT NULL
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
 
@@ -34,7 +37,7 @@ CREATE TABLE `Guest_User` (
 
   `FirstName` varchar(11) DEFAULT NULL,
 
-  `Shipping_Address` varchar(9) DEFAULT NULL
+  `Shipping_Address` varchar(100) DEFAULT NULL
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
 
@@ -51,7 +54,7 @@ CREATE TABLE `orders` (
 
   `Total` int(4) DEFAULT NULL,
 
-  `Oreder_date` datetime DEFAULT NULL
+  `Order_date` datetime DEFAULT NULL
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
 
@@ -105,11 +108,11 @@ CREATE TABLE `items` (
 
   `Name` varchar(33) DEFAULT NULL,
 
-  `price` int(4) DEFAULT NULL,
+  `price` varchar(10) DEFAULT NULL,
 
   `Score` int(3) NOT NULL,
 
-  `Comments` int(1) DEFAULT NULL,
+  `Comments` varchar(50) DEFAULT NULL,
 
   `Stock` int(3) DEFAULT NULL,
 
@@ -263,3 +266,19 @@ ADD FOREIGN KEY (order_id) REFERENCES items (item_id);
 ALTER TABLE items
 
 ADD FOREIGN KEY (item_id) REFERENCES Admin (AdminUser_id);
+
+
+ALTER TABLE Promo_Code
+
+ADD FOREIGN KEY (Promo_id) REFERENCES Admin(AdminUser_id);
+
+
+INSERT INTO Admin (`AdminUser_id`, `LastName`, `FirstName`,`Admin_UserName`, `password`) VALUES
+
+(1, 'Zhang', 'Xiaolei','zxiaolei','123456');
+
+(2, 'Vue', 'Jamie','vjamue','123456');
+
+(3, 'Lynaugh', 'Thomas','lthomas','123456');
+
+(4, 'Que', 'Qiren','qqiren','123456');
