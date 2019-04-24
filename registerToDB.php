@@ -1,28 +1,46 @@
 <?php
-$con = mysqli_connect('127.0.0.1', 'root', 'OmeletPenguin0!', 'ShoppingCart');
+$FirstName = filter_input(INPUT_POST, 'reg_first');
+$LastName = filter_input(INPUT_POST, 'reg_last');
+$email = filter_input(INPUT_POST, 'reg_email');
+$phoneNumber = filter_input(INPUT_POST, 'reg_phone');
+$password = filter_input(INPUT_POST, 'reg_password');
 
-	if(!$con) {
-		echo 'Not connected to server';
-	}
+//	Encrypt password
+$password = md5($password);
 
-	if (!mysqli_select_db($con, 'ShoppingCart')) {
-		echo 'Database not selected';
-	}
-
-	$LastName = $_POST['reg_name'];
-	$password = $_POST['reg_password'];
-
-	$sql = "SET FOREIGN_KEY_CHECKS=0";
-	$sql = "INSERT INTO Register_User (ExistedUser_id, LastName, FirstName, Existed_UserName, password, Shipping_Address)
-			VALUES ('work', 'work', 'work', 'work', '$password', '123 street')";
-
-	if (!mysqli_query($con, $sql)) {
-		echo 'Not inserted';
-	}
-
-	else {
-		echo 'Inserted data';
-	}
-
-	header("refresh:2; url=registration.html");
+	if (!empty($password)){
+			$host = "localhost";
+			$dbusername = "root";
+			$dbpassword = "OmeletPenguin0!";
+			$dbname = "shoppingcartdb";
+			
+			// Connect to ShoppingCartDB
+			$conn = new mysqli($host, $dbusername, $dbpassword, $dbname);
+			
+			if (mysqli_connect_error()) {
+				die('Connect Error('. mysqli_connect_errno().')'. mysqli_connect_error());
+			}
+			else {
+				$sql = "INSERT INTO register_user (LastName, FirstName, password, email, phoneNumber)
+				values ('$LastName','$FirstName','$password','$email','$phoneNumber')";
+				
+				if ($conn->query($sql)){
+			echo"Congratulations "; echo '<br />';
+			echo"Your Registration was successful "; echo '<br />';
+			echo "go back to sign in "; echo '<br />';
+			}
+			else{
+			echo "Error: ". $sql ."
+			". $conn->error;
+			}
+			
+			$conn->close();
+	
+			
+		}
+		}
+		else {
+			echo "All fields are required";
+			die();
+		}
 ?>
