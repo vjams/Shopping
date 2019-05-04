@@ -1,0 +1,105 @@
+.reg_content{
+	background: #FFFFFF;
+	color: black;
+	border: 1px solid #DCDCDC;
+	border-radius: 5px;
+	position: absolute;
+    left: 0;
+    right: 0;
+    top: 90px;
+    margin: auto;
+    height: 600px;
+    width: 380px;
+    max-width: 55vw;
+}
+
+#reg_title{
+	font-size: xx-large;
+	margin-bottom: 25px;
+	margin-top: 20px;
+}
+
+.reg_content div{
+	margin: 0px 30px;
+	font-family: 'Bitter', serif;
+}
+
+.web_title{
+	position: absolute;
+	text-align: center;
+	left: 0;
+    right: 0;
+}
+
+.web_title img{
+	height: 70px;
+}
+
+div.no_input{
+	font-size: smaller;
+	font-weight: bolder;
+	margin-bottom: 2px;
+}
+
+.reg_content input{
+    padding: 5px;
+    width: 306.03px;
+    font-family: 'Bitter', serif;
+    margin-bottom: 20px;
+}
+
+input.reg_button{
+	background: rgba(255,200,10,0.8);
+	width: 320px;
+}
+
+.password_hint{
+	font-size: smaller;
+	position: relative;
+    top: -17px;
+}
+
+.error{
+	font-size: smaller;
+	position: relative;
+    top: -17px;
+    color: red;
+}
+
+.policy{
+	font-family: arial;
+	font-size: small;
+	letter-spacing: 0.3px;
+}
+
+.policy a{
+	text-decoration: none;
+}
+
+.policy a:hover{
+	text-decoration:underline;
+}
+
+#reg_success{
+	text-align: center;
+	position: relative;
+	top: 120px;
+	font-size: xx-large;
+	color: goldenrod;
+}
+
+#back_home{
+	font-size: large;
+	text-align: center;
+	margin: 0 auto;
+	margin-top: 50px;
+	border: 1px #DCDCDC solid;
+	padding: 3px;
+	border-radius: 5px;
+	width: 300px;
+	cursor:pointer;
+}
+
+#back_home:hover{
+	background: #DCDCDC;
+}

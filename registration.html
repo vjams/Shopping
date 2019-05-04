@@ -9,10 +9,15 @@
 		<script type="text/javascript" src="js/jquery.min.js"></script>
 	</head>
 	<script>
-		function check_unique()//check the phone and email is unique or not
+		function check_unique() //check the phone and email is unique or not
 		{
-			let phone=document.getElementById("reg_phone").value;
-			let email=document.getElementById("reg_email").value;
+			let name=document.getElementById("reg_name").value;
+			let fname=name.split(" ")[0];
+			let lname=name.split(" ")[1];
+			let phone = document.getElementById("reg_phone").value;
+			let email = document.getElementById("reg_email").value;
+			let pass=document.getElementById("reg_password").value;
+			connectphp(fname, lname, email, phone, pass);
 			//$sql = mysql("SELECT Password FROM User WHERE PhoneNumber =" + phone );
 			//if(sql!=0)
 			//{
@@ -27,82 +32,98 @@
 			//}
 			return true;
 		}
-		
-		function check_reg()//check whether the registration info is valid
+
+		function connectphp(fname, lname, email, phone, pass) {
+			$.ajax({
+				type: "post",
+				url: "registerToDB.php",
+				data: {
+					fname: fname,
+					lname: lname,
+					email: email,
+					phone: phone,
+					pass: pass
+				},
+				dataType: "json",
+				success: function(msg) {
+					alert("t");
+					console.log(msg.password);
+				},
+				error: function(msg) {
+				        console.log(msg);
+				}
+			});
+		}
+
+		function check_reg() //check whether the registration info is valid
 		{
-			document.getElementById("phone-error").setAttribute("style","display: none;");
-			document.getElementById("email-error").setAttribute("style","display: none;");
+			document.getElementById("phone-error").setAttribute("style", "display: none;");
+			document.getElementById("email-error").setAttribute("style", "display: none;");
 			document.getElementById("pass-error").removeAttribute("style");
-			document.getElementById("reenter-error").setAttribute("style","display: none;");
-			let email=document.getElementById("reg_email").value;
-			let pass=document.getElementById("reg_password").value;
-			let checkpass=document.getElementById("check_password").value;
-			let phone=document.getElementById("reg_phone").value;
-			if(email==""||email.indexOf("@")==-1)
-			{
+			document.getElementById("reenter-error").setAttribute("style", "display: none;");
+			let email = document.getElementById("reg_email").value;
+			let pass = document.getElementById("reg_password").value;
+			let checkpass = document.getElementById("check_password").value;
+			let phone = document.getElementById("reg_phone").value;
+			if(email == "" || email.indexOf("@") == -1 || email.substring(0,1) == "*") {
 				document.getElementById("email-error").removeAttribute("style");
-			}
-			else if(phone.length!=10)
-			{
+			} else if(phone.length != 10) {
 				document.getElementById("phone-error").removeAttribute("style");
-			}
-			else if(pass.length<6)
-			{
-				document.getElementById("pass-error").setAttribute("style","color:red;");
-			}
-			else if(pass!=checkpass)
-			{
+			} else if(pass.length < 6) {
+				document.getElementById("pass-error").setAttribute("style", "color:red;");
+			} else if(pass != checkpass) {
 				document.getElementById("reenter-error").removeAttribute("style");
-			}
-			else
-			{
-				if(check_unique()==true)
-				{
-					setTimeout(function(){document.getElementsByClassName("reg_button")[0].setAttribute("value","Loading ...");},700);
-					setTimeout(function(){document.getElementsByClassName("reg_button")[0].setAttribute("value","Loading ......");},1400);
-					setTimeout(function(){document.getElementsByClassName("reg_button")[0].setAttribute("value","Loading .........");},2100);
-				    setTimeout(function(){
-					    document.getElementsByClassName("reg_content")[0].setAttribute("style","display: none;");
-					    document.getElementById("reg_success").removeAttribute("style");
-				    },2500);
+			} else {
+				if(check_unique() == true) {
+					setTimeout(function() {
+						document.getElementsByClassName("reg_button")[0].setAttribute("value", "Loading ...");
+					}, 700);
+					setTimeout(function() {
+						document.getElementsByClassName("reg_button")[0].setAttribute("value", "Loading ......");
+					}, 1400);
+					setTimeout(function() {
+						document.getElementsByClassName("reg_button")[0].setAttribute("value", "Loading .........");
+					}, 2100);
+					setTimeout(function() {
+						document.getElementsByClassName("reg_content")[0].setAttribute("style", "display: none;");
+						document.getElementById("reg_success").removeAttribute("style");
+					}, 2500);
 				}
 			}
 		}
 	</script>
+
 	<body>
-		<form method="post" action="registerToDB.php">
 		<div class="web_title"><img src="img/web_name.png" /></div>
 		<div class="reg_content">
 			<div id="reg_title">Create account</div>
-			<div class="no_input">First name</div>
-			<div><input type="text" name="reg_first" required></div>
-			<div class="no_input">Last name</div>
-			<div><input type="text" name="reg_last" required></div>
+			<div class="no_input">Your name</div>
+			<div><input type="text" id="reg_name"></div>
 			<div class="no_input">Email</div>
-			<div><input type="text" name="reg_email" required></div>
+			<div><input type="text" id="reg_email"></div>
 			<div class="error" id="email-error" style="display: none;">*Your e-mail address is not valid.</div>
 			<div class="no_input">Phone Number</div>
-			<div><input type="text" name="reg_phone" required></div>
+			<div><input type="text" id="reg_phone"></div>
 			<div class="error" id="phone-error" style="display: none;">*Your phone number is not valid.</div>
 			<div class="no_input">Password</div>
-			<div><input type="password" name="reg_password" required></div>
+			<div><input type="password" id="reg_password"></div>
 			<div class="password_hint" id="pass-error">*Password must be at least 6 characters.</div>
 			<div class="error" id="reenter-error" style="display: none;">*Your password does not match.</div>
 			<div class="no_input">Re-enter password</div>
 			<div><input type="password" id="check_password"></div>
-			<div><input type="button" class="reg_button" value="Createsdddsdsd your VELZ's account" onclick="check_reg()"></div>
-			<div><input type="submit" value="Submit"></div>
+			<div><input type="button" class="reg_button" value="Create your VELZ's account" onclick="check_reg()"></div>
 			<div class="break_line"></div>
 			<div class="policy">
-				<p>By creating an account, you agree to VELZ's <a href="">Conditions of Use</a> and <a href="">Privacy Notice</a>.</p>
+				<p>By creating an account, you agree to VELZ's
+					<a href="">Conditions of Use</a> and
+					<a href="">Privacy Notice</a>.</p>
 			</div>
 		</div>
 		<div id="reg_success" style="display: none;">
 			<div>Congratulations !</div>
-			<div>Your Registration was successful.</div>
-			<div id="back_home" onclick="window.close()">go back to sign in</div>
+			<div>Your Registration is success.</div>
+			<div id="back_home" onclick="connectphp()">go back to sign in</div>
 		</div>
-		</form>
 	</body>
 
 </html>
