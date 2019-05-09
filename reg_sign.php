@@ -2,69 +2,71 @@
 
 $Type=$_POST['type'];
 $Email=$_POST['email'];
-$Phone=$_POST['phone'];
-$Pass=$_POST['currpass'];
 
-$Pass = md5($Pass);
 
-if (!empty($password)) {
+$Pass=$_POST['pass'];
+
+// Encrypt password
+//$Pass = md5($Pass);
+
+if (!empty($Pass)) {
 	$host = "localhost";
 	$dbusername = "root";
 	$dbpassword = "";
 	$dbname = "shoppingcartdb";
 
-	$conn = new mysqli($host, $dbusername, $dbpassword, $dbname);
+	$conn = mysql_connect($host, $dbusername, $dbpassword, $dbname);
 
 	if (mysqli_connect_error()) {
-		$password="false";
+		$Pass="0";
 
 		die('Connect Error('. mysqli_connect_errno().')'. mysqli_connect_error());
 
 	}
 	else {
-		$sql = "SET foreign_key_checks = 0";
-
+		$row;
 		if ($Type == 2) {
-		$sql = "SELECT FirstName, LastName, password, VIP, ExistedUser_ID FROM Register_User WHERE email = '.$Email.'";
-		}
-		else if ($Type == 3) {
-			$sql = "SELECT FirstName, LastName, password, VIP, ExistedUser_ID FROM Register_User WHERE phoneNumber = "$Phone"
-				LIMIT 1";
-		
-		}
+			$use = mysql_query("USE shoppingcartdb", $conn);
+			$result = mysql_query("SELECT FirstName, LastName, password, Cart, Promo, VIP, ExistedUser_ID FROM Register_User WHERE email = '$Email'", $conn);
 
-		else {
-		$sql = "SELECT FirstName, LastName, password, AdminUser_id FROM Admin
-			WHERE email = "$Email"
-				LIMIT 1";
-		 
 		}
-
-		$result = $conn->query($sql);
-                if($result->num-rows > 0)
+			$use = mysql_query("USE shoppingcartdb", $conn);
+			$result = mysql_query("SELECT FirstName, LastName, password, AdminUser_id FROM Admin WHERE email = '$Email'", $conn);
+		}
+	
+		if($result)
 		{
-			if($row["password"]==$Pass)
-			{
-				$Pass=2;
-			}
-			else
+
+			$row = mysql_fetch_array( $result );
+			if($row[2]==$Pass)
 			{
 				$Pass=1;
 			}
-			header('Content-type: application/json');
-			while($row=mysql_fetch_array($result)){
-				echo '{"fname":"'.$row["FirstName"].'","pass":"'.$Pass.'"}';
+			else
+			{
+				$Pass=2;
 			}
+			header('Content-type: application/json');
+
+			echo '{"fname":"'.$row[0].'","lname":"'.$row[1].'","cart":"'.$row[3].'","promo":"'.$row[4].'","VIP":"'.$row[5].'","pass":"'.$Pass.'"}';
+
 		}
 		else {
+
+
 			header('Contect-type: application/json');
-			while ($row=mysql_fetch_array($result)){
-				echo '{"pass":"0"}';
+			echo '{"pass":"0"}';
 		}
 
-		}
 
-		$conn->close();
+
+
 	}
+
+	mysql_close($conn);
+
+
+
+}
 
 ?>

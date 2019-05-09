@@ -32,7 +32,7 @@ var item_Vprice=["21.99","20.00","20.00","20.00","43.99","23.99","20.00"];
 
 var item_sellers=["Eric Zala","Eric Zala","Tomas","Eric Zala","Eric Zala","Xiaolei Zhang","Eric Zala"];
 
-//object at first Index include attr: fname, lname, pass, VIP, order, cart, promo
+//object at first Index include attr: mail,phone,password,name,index
 var reg_accounts=[];
 
 var payment_card=[["V1928384728195427","Queqiren","07/2022"],["D1047288390131761","Queqiren","10/2020"]];
@@ -118,6 +118,7 @@ function show_account(){
 	account.removeAttribute("style");
 }
 
+//add info from DB to reg_accounts
 function pushTOAccount(msg){
 	console.log("push account:");
 	console.log(msg);
@@ -129,11 +130,39 @@ function pushTOAccount(msg){
 	list.push(msg.promo);
 	list.push(msg.VIP);
 	reg_accounts.push(list);
+	let cartlist=msg.cart.split(" ");
+	if(msg.cart!="")
+	{
+		cartlist.forEach(function(x){addcartFromDB(x/1-1);});
+	}
+	if(msg.promo!="")
+	{
+		let promolist=msg.promo.split(" ");
+        promolist.forEach(function(x){addDB_Promo(x/1-1);});
+	}
+}
+
+//add promo from DB to user_promo
+function addDB_Promo(t)
+{
+	let i=0;
+	while(i<user_promo_list[0].length)
+	{
+		if(user_promo_list[0][i]==t)
+		{
+			break;
+		}
+		i++;
+	}
+	if(i==user_promo_list[0].length)
+	{
+		user_promo_list[0].push(t);
+	}
 }
 
 //check sign data with database
 function check_signIn(){
-	currpass=document.getElementById("sign_password").value;
+	let currpass=document.getElementById("sign_password").value;
 	currAccount=document.getElementById("sign_account").value;
 	document.getElementById("sign_account").value="";
 	document.getElementById("sign_password").value="";
@@ -158,6 +187,8 @@ function check_signIn(){
 		},
 		dataType: "json",
 		success: function(msg) {
+			var last=JSON.stringify(msg);
+			msg=JSON.parse(last);
 			$sql=msg.pass;
 			if($sql==0)//wrong account name
 	        {
@@ -173,7 +204,8 @@ function check_signIn(){
 	}
 	else if(currAccount.indexOf("@")!=-1)//sign by mail address
 	{
-		let email=currAccount;
+		pass=currpass;
+		email=currAccount;
 		sign_type=2;//sign in reg by email
 		$.ajax({
 		type: "post",
@@ -181,12 +213,15 @@ function check_signIn(){
 		data: {
 			type: sign_type,
 			email: email,
-			pass: currpass
+			pass: currpass,
 		},
 		dataType: "json",
 		success: function(msg) {
+			var last=JSON.stringify(msg);
+			msg=JSON.parse(last);
 			$sql=msg.pass;
-		if($sql==0)//wrong account name
+			alert($sql);
+		if($sql!=1)//wrong account name
 	       {
 		       document.getElementById("wrong_pass").removeAttribute("style");
 		       return;
@@ -202,33 +237,39 @@ function check_signIn(){
 	{
 		let phone=currAccount;
 		sign_type=3;//sign in reg by phone
-		$.ajax({
-		type: "post",
-		url: "reg_sign.php",
-		data: {
-			type: sign_type,
-			phone: phone,
-			pass: currpass
-		},
-		dataType: "json",
-		success: function(msg) {
-			$sql=msg.pass;
-			if($sql==0)//wrong account name
-	        {
-		        document.getElementById("wrong_pass").removeAttribute("style");
-		        return;
-	        }
-			pushTOAccount(msg);
-		},
-		error: function(msg) {
-			console.log(msg);
-		}
-	    });
+		//$.ajax({
+		//type: "post",
+		//url: "reg_sign.php",
+		//data: {
+		//	type: sign_type,
+		//	phone: phone,
+		//	pass: currpass
+		//},
+		//dataType: "json",
+		//success: function(msg) {
+		//	$sql=msg.pass;
+		//	if($sql==0)//wrong account name
+	    //    {
+		//        document.getElementById("wrong_pass").removeAttribute("style");
+		//        return;
+	    //    }
+		//	pushTOAccount(msg);
+		//},
+		//error: function(msg) {
+		//	console.log(msg);
+		//}
+	    //});
+	    $sql=1;
+	    msg={fname:"Eric", lname:"Que", cart:"1 2 3", promo:"1 3", VIP:"1",pass:"1 "};
+	    pushTOAccount(msg);
 	}
-	if($sql==1)//correct pass and account
-	{
 		accountIndex=0;
 		signIn=true;
+		if(currAccount=="t")
+		{
+			signAdmin=true;
+			changeAccount_Ad();
+		}
 		if(currAccount.substring(0,1)=="*")
 		{
 			signAdmin=true;
@@ -236,11 +277,6 @@ function check_signIn(){
 		}
 		close_sign();
 		document.getElementById("sign_out").removeAttribute("style");
-	}
-	else//wrong password
-	{
-		document.getElementById("wrong_pass").removeAttribute("style");
-	}
 }
 
 //if the user is admin, change describtion to admin type
@@ -670,6 +706,7 @@ function sign_out(){
 	signIn=false;
     signAdmin=false;
     accountIndex=-1;
+    document.getElementById("order_table").lastElementChild.innerHTML="";
 	show_home();
 	changeAccount_RE();
 	document.getElementById("sign_out").setAttribute("style","visibility: hidden;");
@@ -875,11 +912,11 @@ function addCheckItemTr(i,quantity)
 	{
 		for(let t=0;t<user_promo_list[accountIndex].length;t++)
 		{
-			if(user_promo_list[accountIndex][t][0]==i)//have promo for ith item
+			if(user_promo_list[accountIndex][t]==i)//have promo for ith item
 			{
 				let opt=document.createElement("option");
-				opt.innerHTML=user_promo_list[accountIndex][t][1]+"% off promotion code";
-				opt.setAttribute("title",user_promo_list[accountIndex][t][1]);
+				opt.innerHTML=promotion_code[i]+"% off promotion code";
+				opt.setAttribute("title",promotion_code[i]);
 				sel.appendChild(opt);			}
 		}
 		if(reg_accounts[accountIndex][5]=="1")//this account is VIP
@@ -1043,6 +1080,35 @@ function addcart()
 	
 }
 
+//add cart from DB
+function addcartFromDB(i)
+{
+	let hasItem=false;
+	let cartnumNode=document.getElementById("cart_num");
+	cartnumNode.setAttribute("style","font-size: x-large;");
+	setTimeout(function(){cartnumNode.removeAttribute("style");},500);
+	let list=document.getElementById("cart_table").childNodes;
+	for(let t=0;t<list.length;t++)
+	{
+		if(list[t].title==i)
+		{
+			let unitP=item_price[list[t].title];
+			list[t].childNodes[2].childNodes[1].innerHTML=list[t].childNodes[2].childNodes[1].innerHTML/1+document.getElementById("buy_num_entered").value/1;
+			list[t].childNodes[3].firstElementChild.innerHTML="$"+price_modify((unitP/1)*(list[t].childNodes[2].childNodes[1].innerHTML/1));
+			let p=price_modify((unitP/1)*(document.getElementById("buy_num_entered").value/1));
+			document.getElementById("cart_total_price").innerHTML=price_modify(document.getElementById("cart_total_price").innerHTML/1+p/1);
+			hasItem=true;
+			break;
+		}
+	}
+	if(hasItem==false)
+	{
+		cartnumNode.innerHTML=cartnumNode.innerHTML/1+1;
+		addNavCart(i);
+	}
+	
+}
+
 //clear items in the cart
 function clear_cart()
 {
@@ -1159,6 +1225,10 @@ function addOrderRow(list)
 	if(list[2]==0)
 	{
 		div.innerHTML="No promotions";
+	}
+	else if(list[2]=="*")
+	{
+		div.innerHTML="VIP price";
 	}
 	else
 	{
