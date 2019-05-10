@@ -10,7 +10,7 @@ CREATE DATABASE ShoppingCart;
 USE ShoppingCart;
 
 
-SET FOREIGN_KEY_CHECKS=0
+SET FOREIGN_KEY_CHECKS=0;
 
 
 CREATE TABLE `Register_User` (
@@ -27,9 +27,9 @@ CREATE TABLE `Register_User` (
 
   `Shipping_Address` varchar(100) DEFAULT NULL,
   
-  'email' varchar(20) NOT NULL,
+  `email` varchar(20) NOT NULL,
   
-  'phoneNumber' bigint(12) DEFUALT NULL
+  `phoneNumber` bigint(12) DEFUALT NULL
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=COMPACT;
 
@@ -280,10 +280,10 @@ ADD FOREIGN KEY (Promo_id) REFERENCES Admin(AdminUser_id);
 
 INSERT INTO Admin (`AdminUser_id`, `LastName`, `FirstName`,`Admin_UserName`, `password`) VALUES
 
-(1, 'Zhang', 'Xiaolei','zxiaolei','123456');
+(1, 'Zhang', 'Xiaolei','zxiaolei','123456'),
 
-(2, 'Vue', 'Jamie','vjamue','123456');
+(2, 'Vue', 'Jamie','vjamue','123456'),
 
-(3, 'Lynaugh', 'Thomas','lthomas','123456');
+(3, 'Lynaugh', 'Thomas','lthomas','123456'),
 
 (4, 'Que', 'Qiren','qqiren','123456');
