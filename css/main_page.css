@@ -46,8 +46,8 @@ header {
 	padding-right: 5px;
 	padding-left: 4px;
 	position: relative;
-	top: 0.95px;
 	text-align: center;
+	vertical-align: middle;
 }
 
 .nav_search_pic {
@@ -1119,4 +1119,60 @@ input.order_edit{
 	left: 530px;
 	font-size: 13px;
 	color: red;
+}
+
+#view_promo_tbody{
+	text-align: center;
+}
+
+#view_promo_table thead th{
+	padding: 8px;
+	font-size: large;
+	text-align: center;
+}
+
+#view_promo_table tbody td{
+	padding: 8px;
+	border-top: 1px solid #ddd;
+	margin: 0px;
+	font-size: 15px;
+}
+
+#view_promo_table tbody tr:nth-of-type(2n+1){
+	background: #F5F5F5;
+}
+
+.update_goods_container div{
+	font-size: 16px;
+	margin: 5px;
+}
+
+.update_goods_container div:last-child{
+	margin-bottom: 10px;
+}
+
+#update_goods_button:focus{
+	border-color: rgb(63,162,255);
+	box-shadow: 0px 0px 5px rgba(63,162,255,.5);
+}
+
+#update_goods_button{
+	font-weight: bolder;
+	vertical-align: middle;
+	height: 34px;
+    padding: 6px 8px;
+    font-size: 15px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border-radius: 4px;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    margin-left: 5px;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+}
+
+#admin_order_table th{
+	font-size: 16px;
+	text-align: center;
 }

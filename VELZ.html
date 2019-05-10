@@ -2,6 +2,7 @@
 <html>
 
 	<head>
+		<meta charset="UTF-8">
 		<title>VELZ's Market</title>
 		<link rel="stylesheet" href="css/style.css">
 		<link rel="stylesheet" href="css/main_page.css">
@@ -79,7 +80,7 @@
 				<table class="nav_subtitles">
 					<tr>
 						<td>
-							<a id="nav-your-velz">Your VELZ.com</a>
+							<a id="nav_help">Know how to use the VELZ's Market</a>
 						</td>
 					</tr>
 				</table>
@@ -212,9 +213,75 @@
 
 				</div>
 			</div>
-			<div id="search_promo" class="big_page" style="display: none;">
-				<h1 style="text-align: left;">Search Promo Codes</h1>
-				
+			<div id="view_promo" class="big_page" style="display: none;">
+				<h1 style="text-align: left;">View Promo Codes</h1>
+				<table id="view_promo_table">
+					<thead>
+						<th style="width: 814px;">Item Name</th>
+						<th style="width: 114px;">Rate(%)</th>
+						<th style="width: 204px;">Start Date</th>
+						<th style="width: 204px;">Due Date</th>
+
+						<th></th>
+					</thead>
+					<tbody id="view_promo_tbody"></tbody>
+				</table>
+			</div>
+			<div id="update_goods" class="big_page" style="display: none;">
+				<h1 style="text-align: left;">Delete your goods</h1>
+				<div class="form_container" id="search_goods_form">
+					<form>
+						<div class="form-group">
+							<label for="search_goods_Field">Search Item to Delete</label>
+							<input class="promo_form_input" placeholder="search" type="text" id="search_goods_Field" />
+						</div>
+						<input style="padding-top: 0px;" class="promo_form_input" type="button" value="&darr;" id="search_goods_Button" onclick="searchGoods()" />
+					</form>
+				</div>
+				<div class="form_container" id="goods_delete_form">
+					<form>
+						<div class="form-group">
+							<label for="goods_name_Field">Item Name:</label>
+							<select style="max-width: 900px;min-width: 200px;" class="promo_form_input" id="goods_name_Field"></select>
+						</div>
+						<input style="padding-top: 0px;" class="promo_form_input" type="button" value="Delete" id="delete_goods_Button" onclick="DeleteGoods()" />
+					</form>
+				</div>
+				<h1 style="text-align: left;margin-left: 2px;">Add new goods & Update your goods</h1>
+				<div>
+					<div class="update_goods_container">
+						<div>Item Name:</div>
+						<div><textarea cols="100" id="update_goods_name"></textarea></div>
+					</div>
+					<div class="update_goods_container">
+						<div>Item Price($):</div>
+						<div><textarea cols="100" id="update_goods_price"></textarea></div>
+					</div>
+					<div class="update_goods_container">
+						<div>Item Vprice($):</div>
+						<div><textarea cols="100" id="update_goods_Vprice"></textarea></div>
+					</div>
+					<div class="update_goods_container">
+						<div>Item Picture(url):</div>
+						<div><textarea cols="100" id="update_goods_pic"></textarea></div>
+					</div>
+					<div class="update_goods_container">
+						<div>In Stock Quantity:</div>
+						<div><textarea cols="100" id="update_goods_instock"></textarea></div>
+					</div>
+					<div class="update_goods_container">
+						<div>Item Description:</div>
+						<div><textarea cols="100" id="update_goods_des"></textarea></div>
+					</div>
+					<div class="update_goods_container">
+						<div>Item Seller:</div>
+						<div><textarea cols="100" id="update_goods_seller"></textarea></div>
+					</div>
+					<div>
+						<input type="button" id="update_goods_button" value="Add new Good" onclick="add_goodsDB()"></input>
+						<input type="button" id="update_goods_button" value="Update the Good" onclick="update_goodsDB()"></input>
+					</div>
+				</div>
 			</div>
 			<div id="edit_promo" class="big_page" style="display: none;">
 				<h1 style="text-align: left;">Edit Promo Codes</h1>
@@ -423,6 +490,22 @@
 					    <span style="display: none;">You must choose one payment option</span>
 					</div>
 					</div>
+				</div>
+				<div id="admin_order" class="big_page" style="display: none;">
+					<h1 style="text-align: left;margin-bottom: 0px;">View and Update Your Orders</h1>
+					<table id="admin_order_table">
+						<thead>
+							<th style="width: 200px;">User Name</th>
+							<th style="width: 600px;">Item Name</th>
+							<th style="width: 100px;">Quantity</th>
+							<th style="width: 100px;">Promotions</th>
+							<th style="width: 100px;">Price</th>
+							<th style="width: 500px;">Shipping address</th>
+							<th style="width: 150px;">Order Date</th>
+							<th style="width: 150px;">Order Status</th>
+						</thead>
+					    <tbody id="admin_order_tbody"></tbody>
+					</table>
 				</div>
 				<div id="order_page" class="big_page" style="display: none;">
 					<h1 style="text-align: left;margin-bottom: 0px;">Your Orders</h1>

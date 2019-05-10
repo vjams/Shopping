@@ -2,6 +2,7 @@ var signIn=false;//sign status
 var signAdmin=false;//the sign in account is an admin
 var accountIndex=-1;//account index
 var checkingcart=false;//checking items in cart
+var Email="";
 
 var item_names=["Bandai Hobby RG 1/144 Mobile Suit Gundam ZGMF-X09A Justice Gundam","Bandai Hobby HG 1/144 Mobile Suit Gundam ZGMF-X10A Freedom Gundam", 
 "Bandai Hobby HG 1/144 Mobile Suit Gundam RX-77-2 Guncannon Gundam", "Bandai Hobby HG 1/144 Mobile Suit Gundam RX-78 Gundam MK-II(A.E.U.G)", 
@@ -12,19 +13,17 @@ var item_colors=[["test_item/71.jpg"],["test_item/hgce-freedom-gundam-revive-1-7
 ["test_item/201511021821571f8-768x486.jpg"],["test_item/20110831001953816.jpg"],["test_item/TB1vP0sHFXXXXbkaXXXXXXXXXXX_!!0-item_pic.jpg"],
 ["test_item/TB2v48udXXXXXamXXXXXXXXXXXX_!!2340787172.jpg"]];
 
-var item_sizes=[["One Standard Pack"],["One Standard Pack"],["One Standard Pack"],["One Standard Pack"],["One Standard Pack"],["One Standard Pack"],["One Standard Pack"]];
-
 var item_pics=["test_item/71.jpg","test_item/hgce-freedom-gundam-revive-1-768x484.jpg","test_item/newborn-revive-guncannon-box-art-2.jpg",
 "test_item/201511021821571f8-768x486.jpg","test_item/20110831001953816.jpg","test_item/TB1vP0sHFXXXXbkaXXXXXXXXXXX_!!0-item_pic.jpg",
 "test_item/TB2v48udXXXXXamXXXXXXXXXXXX_!!2340787172.jpg"];
 
 var item_price=["24.40","22.99","22.99","22.99","46.40","26.40","22.99"];
 
-var promotion_code=["20","0","0","10","0","5","0"];
+var promotion_code=["20","0","0","10","0","5","30"];
 
-var promo_due=["2019-05-12","","","2019-05-01","","2019-04-22",""];
+var promo_due=["2019-05-12","","","2019-07-01","","2019-04-22","2019-06-22"];
 
-var promo_start=["2019-04-01","","","2019-04-01","","2019-04-01",""];
+var promo_start=["2019-04-01","","","2019-06-01","","2019-04-01","2019-04-01"];
 
 var item_InStock=["99","99","99","99","99","99","99"];
 
@@ -39,12 +38,10 @@ var payment_card=[["V1928384728195427","Queqiren","07/2022"],["D1047288390131761
 
 var guest_promo_list=[];
 
-//correspond to accountIndex
+//include index of item
 var user_promo_list=[[]];
 
 var order=[];
-
-var item_scores=[];
 
 var item_descrips=[];
 
@@ -83,7 +80,7 @@ $(".nav_cart").click(function(){
     $("#cart_div").css("overflow-x","hidden");
     $("#cart_div").css("overflow-y","auto");
   });
-});
+})
 
 //open registration page
 function create_user(){
@@ -120,8 +117,29 @@ function show_account(){
 
 //add info from DB to reg_accounts
 function pushTOAccount(msg){
-	console.log("push account:");
+	update_getPromoDB();
+	getOrderHistoryDB();
+	getCard();
+	document.getElementById("your_orders").addEventListener("click",show_order);
 	console.log(msg);
+	accountIndex=0;
+	signIn=true;
+	order=[];
+	if(Email=="t")
+	{
+		signAdmin=true;
+		changeAccount_Ad();
+	}
+	if(Email.substring(0,1)=="*")
+	{
+		signAdmin=true;
+		changeAccount_Ad();
+		close_sign();
+		document.getElementById("sign_out").removeAttribute("style");
+		return;
+	}
+	close_sign();
+	document.getElementById("sign_out").removeAttribute("style");
 	let list=[];
 	list.push(msg.fname);
 	list.push(msg.lname);
@@ -130,34 +148,69 @@ function pushTOAccount(msg){
 	list.push(msg.promo);
 	list.push(msg.VIP);
 	reg_accounts.push(list);
-	let cartlist=msg.cart.split(" ");
+	msg.cart=msg.cart.substring(0,msg.cart.length-1);
+	let cartlist=msg.cart.split(",");
 	if(msg.cart!="")
 	{
-		cartlist.forEach(function(x){addcartFromDB(x/1-1);});
+		cartlist.forEach(function(x){
+			x=x.split(" ")
+			addcartFromDB(x[0]/1-1,x[1]);});
 	}
 	if(msg.promo!="")
 	{
-		let promolist=msg.promo.split(" ");
+		let promolist=msg.promo.substring(0,msg.promo.length-1).split(" ");
+		user_promo_list=[[]];
         promolist.forEach(function(x){addDB_Promo(x/1-1);});
 	}
+	updateCartDB();
+	getMoveIndex();
+}
+
+function getMoveIndex(){
+	let email=Email;
+	$.ajax({
+		type: "post",
+		url: "getMove.php",
+		data: {
+			email: email
+		},
+		dataType: "json",
+		success: function(msg) {
+			update_promoId(msg.str/1);
+	        update_cartId(msg.str/1);
+	},
+		error: function(msg) {
+		}
+	});
+}
+
+function getCard(){
+	let email=Email;
+	$.ajax({
+		type: "post",
+		url: "getCard.php",
+		data: {
+			email: email
+		},
+		dataType: "json",
+		success: function(msg) {
+			msg=msg.str.substring(0,msg.str.length-1);
+			let list=msg.split(";");
+			for(let t=0;t<list.length;t++)
+			{
+				list[t]=list[t].split(",");
+			}
+			payment_card=list;
+	},
+		error: function(msg) {
+		}
+	});
 }
 
 //add promo from DB to user_promo
 function addDB_Promo(t)
 {
-	let i=0;
-	while(i<user_promo_list[0].length)
-	{
-		if(user_promo_list[0][i]==t)
-		{
-			break;
-		}
-		i++;
-	}
-	if(i==user_promo_list[0].length)
-	{
-		user_promo_list[0].push(t);
-	}
+	user_promo_list[0].push(t);
 }
 
 //check sign data with database
@@ -175,7 +228,8 @@ function check_signIn(){
 	}
 	if(currAccount.substring(0,1)=="*")//admin
 	{
-		let email=currAccount;
+		pass=currpass;
+		email=currAccount;
 		sign_type=1;//sign in admin
 		$.ajax({
 		type: "post",
@@ -190,15 +244,16 @@ function check_signIn(){
 			var last=JSON.stringify(msg);
 			msg=JSON.parse(last);
 			$sql=msg.pass;
-			if($sql==0)//wrong account name
+			if($sql!=1)//wrong pass or account name
 	        {
 		        document.getElementById("wrong_pass").removeAttribute("style");
 		        return;
 	        }
+	        Email=currAccount;
 			pushTOAccount(msg);
 		},
 		error: function(msg) {
-			console.log(msg);
+			document.getElementById("wrong_pass").removeAttribute("style");
 		}
 	    });
 	}
@@ -220,16 +275,16 @@ function check_signIn(){
 			var last=JSON.stringify(msg);
 			msg=JSON.parse(last);
 			$sql=msg.pass;
-			alert($sql);
-		if($sql!=1)//wrong account name
-	       {
-		       document.getElementById("wrong_pass").removeAttribute("style");
-		       return;
-	       }
+		    if($sql!=1)//wrong account name
+	        {
+		        document.getElementById("wrong_pass").removeAttribute("style");
+		        return;
+	        }
+	        Email=currAccount;
 			pushTOAccount(msg);
 		},
 		error: function(msg) {
-			console.log(msg);
+			document.getElementById("wrong_pass").removeAttribute("style");
 		}
 	   });
 	}
@@ -260,23 +315,10 @@ function check_signIn(){
 		//}
 	    //});
 	    $sql=1;
-	    msg={fname:"Eric", lname:"Que", cart:"1 2 3", promo:"1 3", VIP:"1",pass:"1 "};
+	    Email=currAccount;
+	    msg={fname:"Eric", lname:"Que", cart:"1 2,3 5,", promo:"1 3 ", VIP:"1",pass:"1 "};
 	    pushTOAccount(msg);
 	}
-		accountIndex=0;
-		signIn=true;
-		if(currAccount=="t")
-		{
-			signAdmin=true;
-			changeAccount_Ad();
-		}
-		if(currAccount.substring(0,1)=="*")
-		{
-			signAdmin=true;
-			changeAccount_Ad();
-		}
-		close_sign();
-		document.getElementById("sign_out").removeAttribute("style");
 }
 
 //if the user is admin, change describtion to admin type
@@ -284,21 +326,58 @@ function changeAccount_Ad(){
 	document.getElementById("your_orders").firstElementChild.nextElementSibling.innerHTML="Order Info";
 	document.getElementById("VELZ's_VIP").firstElementChild.setAttribute("src","img/store.png");
 	document.getElementById("your_orders").lastElementChild.innerHTML="View and update your orders";
+	document.getElementById("your_orders").removeEventListener("click",show_order);
+	document.getElementById("your_orders").addEventListener("click",admin_order);
 	document.getElementById("VELZ's_VIP").firstElementChild.nextElementSibling.innerHTML="My Warehouse";
+	document.getElementById("VELZ's_VIP").addEventListener("click",open_warehouse);
 	document.getElementById("VELZ's_VIP").lastElementChild.innerHTML="View and update your goods";
 	document.getElementById("payment_options").firstElementChild.nextElementSibling.innerHTML="Revenue Info";
 	document.getElementById("payment_options").lastElementChild.innerHTML="Check your revenue data";
 	document.getElementById("Promo_Codes").lastElementChild.innerHTML="Update your Promo Codes";
-	document.getElementById("Promo_Codes").removeEventListener("click",open_search_promo);
+	document.getElementById("Promo_Codes").removeEventListener("click",open_view_promo);
 	document.getElementById("Promo_Codes").addEventListener("click",open_edit_promo);
 }
 
-//show search promo page for reg
-function open_search_promo()
+function open_warehouse()
 {
-	let search_promo=document.getElementById("search_promo");
+	let update_goods=document.getElementById("update_goods");
 	hidepage();
-	search_promo.removeAttribute("style");
+	update_goods.removeAttribute("style");
+}
+
+//show view promo page for reg
+function open_view_promo()
+{
+	let tbody=document.getElementById("view_promo_tbody");
+	tbody.innerHTML="";
+	let view_promo=document.getElementById("view_promo");
+	hidepage();
+	view_promo.removeAttribute("style");
+	let list=user_promo_list[0];
+	list.forEach(function(x){
+		if(promotion_code[x]!=0)
+		addViewPromo(x);})
+}
+
+//add the promotion details to view promo page, x is the id of item
+function addViewPromo(x)
+{
+	let tbody=document.getElementById("view_promo_tbody");
+	let tr=document.createElement("tr");
+	tbody.appendChild(tr);
+	let td=document.createElement("td");//item name
+	td.innerHTML=item_names[x];
+	tr.appendChild(td);
+	td=document.createElement("td");//Rate
+	td.innerHTML=promotion_code[x];
+	tr.appendChild(td);
+	td=document.createElement("td");//promo_start
+	td.innerHTML=promo_start[x];
+	tr.appendChild(td);
+	td=document.createElement("td");//promo_due
+	td.innerHTML=promo_due[x];
+	tr.appendChild(td);
+
 }
 
 //show edit promo page for Admin
@@ -379,8 +458,30 @@ $(document).ready(function() {
 
 window.onload=function(){
 	document.getElementById("screen_div").setAttribute("style","margin:0 auto;");
-	document.getElementById("Promo_Codes").addEventListener("click",open_search_promo);
+	document.getElementById("Promo_Codes").addEventListener("click",open_view_promo);
+	document.getElementById("cart_div").setAttribute("style","overflow: hidden auto;display: block;display: none;");
+	getItemDB();
 };
+
+//get Item Info from DB
+function getItemDB(){
+	$.ajax({
+		type: "post",
+		url: "addItem.php",
+		dataType: "json",
+		success: function(msg) {
+			item_names=msg.name.substring(0,msg.name.length-1).split(",");
+			item_pics=msg.pic.substring(0,msg.pic.length-1).split(",");
+			item_price=msg.price.substring(0,msg.price.length-1).split(",");
+			item_InStock=msg.instock.substring(0,msg.instock.length-1).split(",");
+			item_Vprice=msg.vprice.substring(0,msg.vprice.length-1).split(",");
+			item_sellers=msg.seller.substring(0,msg.seller.length-1).split(",");
+			item_descrips=msg.des.substring(0,msg.des.length-1).split(",");
+	},
+		error: function(msg) {
+		}
+	});
+}
 
 //click right scroll button
 function sc_right(){
@@ -546,7 +647,7 @@ function addItemOptions(i)
 	ul=document.createElement("ul");
 	let size=document.getElementById("item_size");
 	size.appendChild(ul);
-	list=item_sizes[i];
+	list=["One Standard Pack"];
 	for(let t=0;t<list.length;t++)
 	{
 		let li=document.createElement("li");
@@ -571,42 +672,66 @@ function switchChange(e,attr)
 }
 
 //add the promocode to user account
-function addUserPromo(rate,i)
+function addUserPromo(i)
 {
 	if(signIn==false)//guest
 	{
 		let temp=false;
-		guest_promo_list.forEach(function(x){if(x[0]==i){x[1]=rate;temp=true;return;}});
+		guest_promo_list.forEach(function(x){if(x==i){temp=true;return;}});
 		if(temp==false)
 		{
-			arr=new Array(i,rate);
-		    guest_promo_list.push(arr);
+		    guest_promo_list.push(i/1);
 		}
 	}
 	else if(signAdmin==false)//reg account
 	{
 		let temp=false;
-		user_promo_list[accountIndex].forEach(function(x){if(x[0]==i){x[1]=rate;temp=true;return;}});
+		user_promo_list[accountIndex].forEach(function(x){if(x==i){temp=true;return;}});
 		if(temp==false)
 		{
-			arr=new Array(i,rate);
-		    user_promo_list[accountIndex].push(arr);
+		    user_promo_list[accountIndex].push(i/1);
 		}
+		AddPromoUserDB();
 	}
 }
 
-//show posted promocode to customer
+//add promo to user account in DB
+function AddPromoUserDB(){
+	let email=Email;
+	let plist="";
+	for(let i=0;i<user_promo_list[0].length;i++)
+	{
+		plist+=user_promo_list[0][i]/1+1;
+		plist+=" ";
+	}
+	$.ajax({
+		type: "post",
+		url: "addPromoUser.php",
+		data: {
+			email: email,
+			promo: plist
+		},
+		dataType: "json",
+		success: function(msg) {
+	},
+		error: function(msg) {
+		}
+	});
+}
+
+//show posted promocode to customer and add to account
 function get_promocode(event)
 {
 	if(event.target.title!="show")
 	{
+		update_getPromoDB();
 		let i=document.getElementById("item_img").firstElementChild.getAttribute("alt");
-		if(promotion_code[i]!="0"&&dateCheck(promo_start[i])==false&&dateCheck(promo_due[i])==true)
+		if(promotion_code[i]!="0"&&dateCheck(promo_due[i])==true)
 		{
 			event.target.innerHTML="Congratulations, you get a "+promotion_code[i]+"% off promotion code!";
 			event.target.setAttribute("title","show");
 			event.target.setAttribute("style","color: gold;font-size:0.8em")
-			addUserPromo(promotion_code[i],i);//add the promocode to user account
+			addUserPromo(i);//add the promocode to user account
 		}
 		else
 		{
@@ -614,6 +739,23 @@ function get_promocode(event)
 			event.target.setAttribute("title","show");
 		}
 	}
+}
+
+//get Promo lists from DB
+function update_getPromoDB(){
+	$.ajax({
+		type: "post",
+		url: "fetchPromo.php",
+		dataType: "json",
+		success: function(msg) {
+			promo_start=msg.start.substring(0,msg.start.length-1).split(",");
+			promo_due=msg.due.substring(0,msg.due.length-1).split(",");
+			promotion_code=msg.rate.substring(0,msg.rate.length-1).split(",");
+	},
+		error: function(msg) {
+			console.log(msg)
+		}
+	});
 }
 
 //check whether the date is over today
@@ -692,13 +834,23 @@ function changeAccount_RE()
 	document.getElementById("your_orders").firstElementChild.nextElementSibling.innerHTML="Your Orders";
 	document.getElementById("VELZ's_VIP").firstElementChild.setAttribute("src","img/vip.png");
 	document.getElementById("your_orders").lastElementChild.innerHTML="Track, return, or buy things again";
+	document.getElementById("your_orders").removeEventListener("click",admin_order);
+	document.getElementById("your_orders").addEventListener("click",show_order);
 	document.getElementById("VELZ's_VIP").firstElementChild.nextElementSibling.innerHTML="VELZ's VIP";
 	document.getElementById("VELZ's_VIP").lastElementChild.innerHTML="View benefit and payment settings";
+	document.getElementById("VELZ's_VIP").removeEventListener("click",open_warehouse);
 	document.getElementById("payment_options").firstElementChild.nextElementSibling.innerHTML="Payment Options";
 	document.getElementById("payment_options").lastElementChild.innerHTML="Edit or add payment methods";
 	document.getElementById("Promo_Codes").lastElementChild.innerHTML="View your promotion codes";
 	document.getElementById("Promo_Codes").removeEventListener("click",open_edit_promo);
-	document.getElementById("Promo_Codes").addEventListener("click",open_search_promo);
+	document.getElementById("Promo_Codes").addEventListener("click",open_view_promo);
+}
+
+//show admin order page
+function admin_order(){
+	admin_order=document.getElementById("admin_order");
+	hidepage();
+	admin_order.setAttribute("style","display: block;");
 }
 
 //sign out the current user and back to home
@@ -707,6 +859,9 @@ function sign_out(){
     signAdmin=false;
     accountIndex=-1;
     document.getElementById("order_table").lastElementChild.innerHTML="";
+    document.getElementById("cart_table").innerHTML="";//cart clear
+	document.getElementById("cart_total_price").innerHTML="0";
+	document.getElementById("cart_num").innerHTML="0";
 	show_home();
 	changeAccount_RE();
 	document.getElementById("sign_out").setAttribute("style","visibility: hidden;");
@@ -746,6 +901,126 @@ function searchPromo()
 			document.getElementById("promo_name_Field").appendChild(opt);
 		}
 	}
+}
+
+//search goods by character
+function searchGoods(){
+	document.getElementById("goods_name_Field").innerHTML="";
+	let val=document.getElementById("search_goods_Field").value;
+	document.getElementById("search_goods_Field").value="";
+	let num=item_names.length;
+	for(let i=0;i<num;i++)
+	{
+		if(item_names[i].toUpperCase().indexOf(val.toUpperCase())!=-1)
+		{
+			let opt=document.createElement("option");
+			opt.innerHTML=item_names[i];
+			opt.setAttribute("title",i);
+			document.getElementById("goods_name_Field").appendChild(opt);
+		}
+	}
+}
+
+//delete the goods in database
+function DeleteGoods(){
+	let index=document.getElementById("goods_name_Field").selectedIndex;
+	let i=document.getElementById("goods_name_Field").childNodes[index].title;
+	let Iname=item_names[i];
+	item_names.splice(i,1,);
+	item_colors.splice(i,1,);
+	item_pics.splice(i,1,);
+	item_price.splice(i,1,);
+	item_Vprice.splice(i,1,);
+	item_sellers.splice(i,1,);
+	item_InStock.splice(i,1,);
+	promotion_code.splice(i,1,);
+	promo_due.splice(i,1,);
+	promo_start.splice(i,1,);
+	document.getElementById("goods_name_Field").innerHTML="";
+	remove_cart_delGoods(i);
+	delGoodsDB(i,Iname);
+}
+
+//delete item in DB
+function delGoodsDB(i,Iname){
+	let itemName=Iname;
+	$.ajax({
+		type: "post",
+		url: "deleteItem.php",
+		data:{
+			itemName: itemName
+		},
+		dataType: "json",
+		success: function(msg) {
+	},
+		error: function(msg) {
+		}
+	});
+	let email=Email;
+	let move=i;
+	$.ajax({
+		type: "post",
+		url: "updateCP.php",
+		data: {
+			email: email,
+			move: move
+		},
+		dataType: "json",
+		success: function(msg) {
+	},
+		error: function(msg) {
+		}
+	});
+}
+
+//update items' Id in userpromo
+function update_promoId(i){
+	let list=user_promo_list[0];
+	for(let t=0;t<list.length;t++)
+	{
+		if(list[t]==i)
+		{
+			list.splice(t,1,);
+		}
+	}
+	for(let t=0;t<list.length;t++)
+	{
+		if(list[t]>i)
+		{
+			list[t]=list[t]-1;
+		}
+	}
+}
+
+//update items' Id in cart
+function update_cartId(i){
+	let list=document.getElementById("cart_table").childNodes;
+	for(let t=0;t<list.length;t+=2)
+	{
+		if(list[t].title>i)
+		{
+			list[t].title=list[t].title-1;
+		}
+	}
+}
+
+//remove item in cart when it's deleted by Admin
+function remove_cart_delGoods(i){
+	let list=document.getElementById("cart_table").childNodes;
+	for(let t=0;t<list.length;t+=2)
+	{
+		if(list[t].title==i)
+		{
+			let tr=list[t];
+	        let p=tr.childNodes[3].firstElementChild.innerHTML.substring(1);
+	        tr.parentNode.removeChild(tr.nextElementSibling);
+	        tr.parentNode.removeChild(tr);
+	        document.getElementById("cart_num").innerHTML=document.getElementById("cart_num").innerHTML-1;
+	        document.getElementById("cart_total_price").innerHTML=price_modify(document.getElementById("cart_total_price").innerHTML/1-p/1);
+	        updateCartDB();
+		}
+	}
+	
 }
 
 //create a row of promo of ith item and add to the table
@@ -836,6 +1111,26 @@ function addNewPromo()
 	let list=document.getElementsByClassName("promo_tbody")[0].childNodes;
 	list.forEach(function(x){if(x.title==i){x.parentNode.removeChild(x);}});
 	addPromoTr(item_names[i],document.getElementById("promo_rate_field").value,document.getElementById("startField").value,document.getElementById("dueField").value,item_price[i],i);
+    update_PromoDB(i/1+1,document.getElementById("promo_rate_field").value,document.getElementById("startField").value,document.getElementById("dueField").value);
+}
+
+//admin add or update promo Info to DB
+function update_PromoDB(index,rate,start,due){
+	$.ajax({
+		type: "post",
+		url: "updatePromo.php",
+		data: {
+			index: index,
+			rate: rate,
+			start: start,
+			due: due
+		},
+		dataType: "json",
+		success: function(msg) {
+	},
+		error: function(msg) {
+		}
+	});
 }
 
 //open checkout page
@@ -854,8 +1149,23 @@ function buynow()
 	let quantity=document.getElementById("buy_num_entered").value;
 	open_checkout();
 	clearCheckInfo();
+	clearAddress();
 	addCheckItemTr(i,quantity);
 }
+
+
+function clearAddress()
+{
+	document.getElementById("checkaddr_name").value="";
+	document.getElementById("checkaddr_addr1").value="";
+	document.getElementById("checkaddr_addr2").value="";
+	document.getElementById("checkaddr_city").value="";
+	document.getElementById("checkaddr_state").value="";
+	document.getElementById("checkaddr_zip").value="";
+	document.getElementById("checkaddr_country").value="";
+	document.getElementById("checkaddr_phone").value="";
+}
+
 
 //clear the Info in check page
 function clearCheckInfo()
@@ -899,11 +1209,11 @@ function addCheckItemTr(i,quantity)
 	{
 		for(let t=0;t<guest_promo_list.length;t++)
 		{
-			if(guest_promo_list[t][0]==i)//have promo for ith item
+			if(guest_promo_list[t]==i&&dateCheck(promo_start[i])==false&&dateCheck(promo_due[i])==true)//have promo for ith item and available
 			{
 				let opt=document.createElement("option");
-				opt.setAttribute("title",opt.innerHTML=guest_promo_list[t][1]);
-				opt.innerHTML=guest_promo_list[t][1]+"% off promotion code of this item";
+				opt.setAttribute("title",opt.innerHTML=promotion_code[i]);
+				opt.innerHTML=promotion_code[i]+"% off promotion code of this item";
 				sel.appendChild(opt);
 			}
 		}
@@ -912,7 +1222,7 @@ function addCheckItemTr(i,quantity)
 	{
 		for(let t=0;t<user_promo_list[accountIndex].length;t++)
 		{
-			if(user_promo_list[accountIndex][t]==i)//have promo for ith item
+			if(user_promo_list[accountIndex][t]==i&&dateCheck(promo_start[i])==false&&dateCheck(promo_due[i])==true)//have promo for ith item and available
 			{
 				let opt=document.createElement("option");
 				opt.innerHTML=promotion_code[i]+"% off promotion code";
@@ -967,7 +1277,7 @@ function onselectPromoPrice(event,i)
 	document.getElementsByClassName("finalprice")[2].innerHTML=price_modify(mod_tax/1+total_price/1);
 }
 
-function addNavCart(i)
+function addNavCart(i,quantity)
 {
 	let table=document.getElementById("cart_table");
 	let tr=document.createElement("tr");
@@ -991,7 +1301,14 @@ function addNavCart(i)
 	tr.appendChild(td);
 	td=document.createElement("td");//item quantity
 	divq=document.createElement("div");
-	divq.innerHTML=document.getElementById("buy_num_entered").value;
+	if(quantity==0)
+	{
+		divq.innerHTML=document.getElementById("buy_num_entered").value;
+	}
+	else
+	{
+		divq.innerHTML=quantity;
+	}
 	let putin=document.createElement("input");
 	putin.addEventListener("click",function(){cart_rowPrice(tr,-1);});
 	putin.value="-";
@@ -1035,6 +1352,7 @@ function del_cart_row(event)
 	tr.parentNode.removeChild(tr);
 	document.getElementById("cart_num").innerHTML=document.getElementById("cart_num").innerHTML-1;
 	document.getElementById("cart_total_price").innerHTML=price_modify(document.getElementById("cart_total_price").innerHTML/1-p/1);
+	updateCartDB();
 }
 
 //change the price in nav cart when quantity change
@@ -1048,6 +1366,7 @@ function cart_rowPrice(tr,change)
 	tr.childNodes[3].firstElementChild.innerHTML="$"+price_modify((q/1+change)*(unitP/1));
 	let p=price_modify((change)*(unitP/1));
 	document.getElementById("cart_total_price").innerHTML=price_modify(document.getElementById("cart_total_price").innerHTML/1+p/1);
+	updateCartDB();
 }
 
 //add items to cart
@@ -1059,7 +1378,7 @@ function addcart()
 	setTimeout(function(){cartnumNode.removeAttribute("style");},500);
 	let i=document.getElementById("item_img").firstElementChild.getAttribute("alt");
 	let list=document.getElementById("cart_table").childNodes;
-	for(let t=0;t<list.length;t++)
+	for(let t=0;t<list.length;t+=2)
 	{
 		if(list[t].title==i)
 		{
@@ -1075,25 +1394,57 @@ function addcart()
 	if(hasItem==false)
 	{
 		cartnumNode.innerHTML=cartnumNode.innerHTML/1+1;
-		addNavCart(i);
+		addNavCart(i,0);
 	}
-	
+	if(signIn==true)
+	{
+		updateCartDB();
+	}
+}
+
+function updateCartDB()
+{
+	let email=Email;
+	let clist="";
+	let list=document.querySelectorAll("#cart_table>tr");
+	for(let i=0;i<list.length;i++)
+	{
+		let temp="";
+		temp+=list[i].title/1+1;
+		temp+=" ";
+		temp+=list[i].childNodes[2].childNodes[1].innerHTML/1;
+		temp+=",";
+		clist+=temp;;
+	}
+	$.ajax({
+		type: "post",
+		url: "addedToCart.php",
+		data: {
+			email: email,
+			cart: clist
+		},
+		dataType: "json",
+		success: function(msg) {
+	},
+		error: function(msg) {
+		}
+	});
 }
 
 //add cart from DB
-function addcartFromDB(i)
+function addcartFromDB(i,quantity)
 {
 	let hasItem=false;
 	let cartnumNode=document.getElementById("cart_num");
 	cartnumNode.setAttribute("style","font-size: x-large;");
 	setTimeout(function(){cartnumNode.removeAttribute("style");},500);
 	let list=document.getElementById("cart_table").childNodes;
-	for(let t=0;t<list.length;t++)
+	for(let t=0;t<list.length;t+=2)
 	{
 		if(list[t].title==i)
 		{
 			let unitP=item_price[list[t].title];
-			list[t].childNodes[2].childNodes[1].innerHTML=list[t].childNodes[2].childNodes[1].innerHTML/1+document.getElementById("buy_num_entered").value/1;
+			list[t].childNodes[2].childNodes[1].innerHTML=list[t].childNodes[2].childNodes[1].innerHTML/1+quantity/1;
 			list[t].childNodes[3].firstElementChild.innerHTML="$"+price_modify((unitP/1)*(list[t].childNodes[2].childNodes[1].innerHTML/1));
 			let p=price_modify((unitP/1)*(document.getElementById("buy_num_entered").value/1));
 			document.getElementById("cart_total_price").innerHTML=price_modify(document.getElementById("cart_total_price").innerHTML/1+p/1);
@@ -1104,7 +1455,7 @@ function addcartFromDB(i)
 	if(hasItem==false)
 	{
 		cartnumNode.innerHTML=cartnumNode.innerHTML/1+1;
-		addNavCart(i);
+		addNavCart(i,quantity);
 	}
 	
 }
@@ -1115,6 +1466,7 @@ function clear_cart()
 	document.getElementById("cart_table").innerHTML="";
 	document.getElementById("cart_total_price").innerHTML="0";
 	document.getElementById("cart_num").innerHTML="0";
+	updateCartDB();
 }
 
 //go to checkout from cart
@@ -1126,6 +1478,7 @@ function cartCkeck()
 	}
 	open_checkout();
 	clearCheckInfo();
+	clearAddress();
 	for(let t=0;t<document.getElementById("cart_num").innerHTML/1;t++)
 	{
 		let tr=document.getElementById("cart_table").childNodes[2*t];
@@ -1185,8 +1538,34 @@ function clearOrder()
 function show_order()
 {
 	content=document.getElementById("order_page");
+	document.getElementById("order_table").firstElementChild.nextElementSibling.innerHTML="";
 	hidepage();
 	content.setAttribute("style","display: block;");
+	order.forEach(function(x){addOrderRow(x);});
+}
+
+//get row by select email push to order
+function getOrderHistoryDB(){
+	email=Email;
+	$.ajax({
+		type: "post",
+		url: "getOrderHis.php",
+		data: {
+			email: email
+		},
+		dataType: "json",
+		success: function(msg) {
+			console.log(msg);
+			msg=msg.str.substring(0,msg.str.length-1);
+			let list=msg.split(";");
+			list.forEach(function(x){
+				let arr=x.substring(0,x.length-1).split(",");
+				order.unshift(arr);
+			})
+	},
+		error: function(msg) {
+		}
+	});
 }
 
 //update order data to database
@@ -1200,6 +1579,41 @@ function update_Order_Data(row)
 	let day=new Date().getFullYear()+"-"+new Date().getMonth()+"-"+new Date().getDate();
 	let arr=new Array(name,quantity,promo,price,day,"To be shipped");
 	order.unshift(arr);
+	let str="";
+	let addr=getAddress();
+	str=str+name+","+quantity+","+promo+","+price+","+day+","+addr;
+	update_OrderDB(str);
+}
+
+function update_OrderDB(str)
+{
+	email=Email;
+	$.ajax({
+		type: "post",
+		url: "orderHistory.php",
+		data: {
+			email: email,
+			str: str
+		},
+		dataType: "json",
+		success: function(msg) {
+	},
+		error: function(msg) {
+		}
+	});
+}
+
+function getAddress()
+{
+	let addr=document.getElementById("checkaddr_name").value+" ";
+	addr=addr+document.getElementById("checkaddr_addr1").value+" ";
+	addr=addr+document.getElementById("checkaddr_addr2").value+" ";
+	addr=addr+document.getElementById("checkaddr_city").value+" ";
+	addr=addr+document.getElementById("checkaddr_state").value+" ";
+	addr=addr+document.getElementById("checkaddr_zip").value+" ";
+	addr=addr+document.getElementById("checkaddr_country").value+" ";
+	addr=addr+document.getElementById("checkaddr_phone").value;
+	return addr;
 }
 
 //add a row of order data to order Info page
@@ -1248,7 +1662,7 @@ function addOrderRow(list)
 	div=document.createElement("div");
 	tr.appendChild(td);
 	td.appendChild(div);
-	div.innerHTML=list[5];
+	div.innerHTML="To be shipped";
 	td=document.createElement("td");
 	let putin=document.createElement("input");
 	tr.appendChild(td);
@@ -1382,32 +1796,116 @@ function addcard(event)
 	let rowcount=document.getElementById("payment_table").lastElementChild.childNodes.length;
 	let h=320+rowcount*40;
 	document.getElementById("checkout_payment").setAttribute("style","display: block;height: "+h+"px;");
+	updateCard();
 }
 
-function encode(code)
+function updateCard()
 {
-	for(let i=0;i<code.length;i++)
+	let list=payment_card;
+	let str="";
+	for(let i=0;i<list.length;i++)
 	{
-		let ch=code.charCodeAt(i);
-		ch=ch+10;
-		let res = String.fromCharCode(ch); 
-		let first=code.substring(0,i);
-		let last=code.substring(i+1);
-		code=first+res+last;
+		for(let j=0;j<list[i].length;j++)
+		{
+			if(j!=list[i].length-1)
+			{
+				str=str+list[i][j]+',';
+			}
+			else
+			{
+				str=str+list[i][j];
+			}
+		}
+		str=str+";";
 	}
-	return code;
+	let email=Email;
+	$.ajax({
+		type: "post",
+		url: "storeCard.php",
+		data: {
+			email: email,
+			str: str
+		},
+		dataType: "json",
+		success: function(msg) {
+	},
+		error: function(msg) {
+		}
+	});
 }
 
-function decode(code)
-{
-	for(let i=0;i<code.length;i++)
-	{
-		let ch=code.charCodeAt(i);
-		ch=ch-10;
-		let res = String.fromCharCode(ch); 
-		let first=code.substring(0,i);
-		let last=code.substring(i+1);
-		code=first+res+last;
-	}
-	console.log(code);
+//update the goods in Database
+function update_goodsDB(){
+	let name=document.getElementById("update_goods_name").value;
+	let price=document.getElementById("update_goods_price").value;
+	let vprice=document.getElementById("update_goods_Vprice").value;
+	let pic=document.getElementById("update_goods_pic").value;
+	let stock=document.getElementById("update_goods_instock").value;
+	let des=document.getElementById("update_goods_des").value;
+	let seller=document.getElementById("update_goods_seller").value;
+	$.ajax({
+		type: "post",
+		url: "updateOldItem.php",
+		data: {
+			name: name,
+			price: price,
+			vprice: vprice,
+			pic: pic,
+			stock: stock,
+			des: des,
+			seller: seller
+		},
+		dataType: "json",
+		success: function(msg) {
+			document.getElementById("update_goods_name").value="";
+			document.getElementById("update_goods_price").value="";
+			document.getElementById("update_goods_Vprice").value="";
+			document.getElementById("update_goods_pic").value="";
+			document.getElementById("update_goods_instock").value="";
+			document.getElementById("update_goods_des").value="";
+			document.getElementById("update_goods_seller").value="";
+	},
+		error: function(msg) {
+		}
+	});
+	getItemDB();
+}
+
+//add new good in Database
+function add_goodsDB(){
+	let name=document.getElementById("update_goods_name").value;
+	let price=document.getElementById("update_goods_price").value;
+	let vprice=document.getElementById("update_goods_Vprice").value;
+	let pic=document.getElementById("update_goods_pic").value;
+	let stock=document.getElementById("update_goods_instock").value;
+	let des=document.getElementById("update_goods_des").value;
+	let seller=document.getElementById("update_goods_seller").value;
+	let id=item_names.length;
+	$.ajax({
+		type: "post",
+		url: "updateItem.php",
+		data: {
+			name: name,
+			price: price,
+			vprice: vprice,
+			pic: pic,
+			stock: stock,
+			des: des,
+			seller: seller,
+			id: id
+		},
+		dataType: "json",
+		success: function(msg) {
+			document.getElementById("update_goods_name").value="";
+			document.getElementById("update_goods_price").value="";
+			document.getElementById("update_goods_Vprice").value="";
+			document.getElementById("update_goods_pic").value="";
+			document.getElementById("update_goods_instock").value="";
+			document.getElementById("update_goods_des").value="";
+			document.getElementById("update_goods_seller").value="";
+	},
+		error: function(msg) {
+		}
+	});
+	getItemDB();
 }

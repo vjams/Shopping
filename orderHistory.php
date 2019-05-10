@@ -1,6 +1,7 @@
 <?php
+
 $email=$_POST['email'];
-$cart=$_POST['cart'];
+$str=$_POST['str'];
 
 $host = "localhost";
 $dbusername = "root";
@@ -11,17 +12,15 @@ $dbname = "shoppingcartdb";
 $conn = mysql_connect($host, $dbusername, $dbpassword, $dbname);
 
 if (mysqli_connect_error()) {
-	
+
 	die('Connect Error('. mysqli_connect_errno().')'. mysqli_connect_error());
 
 }
 
 else {
 	$use = mysql_query("USE shoppingcartdb", $conn);
-	mysql_query("UPDATE Register_User SET Cart = '$cart' WHERE 
-			email = '$email'", $conn);
-
-
+	$sql = mysql_query("SET foreign_key_checks = 0", $conn);
+	mysql_query("INSERT INTO orders (account, orderInfo) VALUES ('$email', '$str')", $conn);
 
 
 	mysql_close($conn);	
@@ -29,3 +28,4 @@ else {
 
 
 ?>
+

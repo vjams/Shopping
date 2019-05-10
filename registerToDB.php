@@ -8,7 +8,7 @@ $phoneNumber=$_POST['phone'];
 
 
 //	Encrypt password
-//$password = md5($password);
+$password = convert_uuencode($password);
 
 if (!empty($password)){
 	$host = "localhost";
